@@ -1,0 +1,32 @@
+services:
+  keycloak-db:
+    image: postgres:latest
+    container_name: keycloak-db
+    environment:
+      POSTGRES_KEYCLOAK_DB: ${POSTGRES_KEYCLOAK_DB}
+      POSTGRES_KEYCLOAK_USER: ${POSTGRES_KEYCLOAK_USER}
+      POSTGRES_KEYCLOAK_PASSWORD: ${POSTGRES_KEYCLOAK_PASSWORD}
+    ports:
+      - "5432:5432"
+    restart: always
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      KEYCLOAK_DB: ${POSTGRES_KEYCLOAK_DB}
+      KEYCLOAK_DB_URL: jdbc:postgresql://${POSTGRES_KEYCLOAK_USER}:5432/${POSTGRES_KEYCLOAK_DB}
+      KEYCLOAK_DB_USERNAME: ${POSTGRES_KEYCLOAK_USER}
+      KEYCLOAK_DB_PASSWORD: ${POSTGRES_KEYCLOAK_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN}
+    ports:
+      - "8088:8080"
+    command:
+      - start-dev
+#    depends_on:
+#      - keycloak-db
+#    restart: always
+
+
+
