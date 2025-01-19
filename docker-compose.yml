@@ -1,4 +1,18 @@
 services:
+  khmengcode-db:
+    image: postgres:latest
+    container_name: khmengcode-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      KEYCLOAK_DB_URL: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5455:5432"
+    restart: always
+
   keycloak-db:
     image: postgres:latest
     container_name: keycloak-db
@@ -13,6 +27,8 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
+    command:
+      - start-dev
     environment:
       KEYCLOAK_DB: ${POSTGRES_KEYCLOAK_DB}
       KEYCLOAK_DB_URL: jdbc:postgresql://${POSTGRES_KEYCLOAK_USER}:5432/${POSTGRES_KEYCLOAK_DB}
@@ -22,11 +38,10 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN}
     ports:
       - "8088:8080"
-    command:
-      - start-dev
-#    depends_on:
-#      - keycloak-db
-#    restart: always
-
-
+    depends_on:
+      - keycloak-db
+    restart: always
+    volumes:
+      - ./keycloak/themes/:/opt/keycloak/themes/
+      - ./keycloak/realm/:/opt/keycloak/data/import
 
